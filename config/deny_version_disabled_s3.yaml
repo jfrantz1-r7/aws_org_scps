@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Configure AWS Config rules to check whether versioning is enabled for your S3 buckets.
+Parameters:
+  ConfigRuleName:
+    Type: 'String'
+    Description: 'Name for the Config rule'
+Resources:
+  CheckForS3VersioningEnabled:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: !Sub ${ConfigRuleName}
+      Description: Checks whether versioning is enabled for your S3 buckets.
+      Source:
+        Owner: AWS
+        SourceIdentifier: S3_BUCKET_VERSIONING_ENABLED
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::S3::Bucket

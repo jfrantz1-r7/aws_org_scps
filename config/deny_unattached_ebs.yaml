@@ -1,0 +1,34 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Configure AWS Config rules to check whether EBS volumes are attached to EC2 instances
+Parameters:
+  ConfigRuleName:
+    Type: 'String'
+    Description: 'Name for the Config rule'
+  deleteOnTermination:
+    Type: 'String'
+    Default: 'None'
+    Description: 'Check for Delete on termination'
+Conditions:
+  deleteOnTermination:
+    Fn::Not:
+    - Fn::Equals:
+      - 'None'
+      - Ref: deleteOnTermination
+Resources:
+  CheckForEc2VolumesInUse:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: !Sub ${ConfigRuleName}
+      Description: Checks whether EBS volumes are attached to EC2 instances
+      InputParameters:
+        deleteOnTermination:
+          Fn::If:
+            - deleteOnTermination
+            - Ref: deleteOnTermination
+            - Ref: AWS::NoValue
+      Source:
+        Owner: AWS
+        SourceIdentifier: EC2_VOLUME_INUSE_CHECK
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::Volume

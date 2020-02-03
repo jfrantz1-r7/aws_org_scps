@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Configure AWS Config rules to check for encryption of all storage volumes attached to compute
+Parameters:
+  ConfigRuleName:
+    Type: 'String'
+    Description: 'Name for the Config rule'
+Resources:
+  CheckForEncryptedVolumes:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: !Sub ${ConfigRuleName}
+      Description: Checks whether EBS volumes that are in an attached state are encrypted.
+      Source:
+        Owner: AWS
+        SourceIdentifier: ENCRYPTED_VOLUMES
+      Scope:
+        ComplianceResourceTypes:
+          - AWS::EC2::Volume

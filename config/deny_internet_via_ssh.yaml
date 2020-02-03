@@ -1,0 +1,18 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Configure AWS Config rules to check whether security groups that are in use disallow SSH
+Parameters:
+  ConfigRuleName:
+    Type: 'String'
+    Description: 'Name for the Config rule'
+Resources:
+  CheckForRestrictedSshPolicy:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: !Sub ${ConfigRuleName}
+      Description: Checks whether security groups that are in use disallow unrestricted incoming SSH traffic.
+      Scope:
+        ComplianceResourceTypes:
+        - AWS::EC2::SecurityGroup
+      Source:
+        Owner: AWS
+        SourceIdentifier: INCOMING_SSH_DISABLED

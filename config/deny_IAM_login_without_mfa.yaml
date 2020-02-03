@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Configure AWS Config rules to check whether the IAM users have MFA enabled
+Parameters:
+  ConfigRuleName:
+    Type: 'String'
+    Description: 'Name for the Config rule'
+  MaximumExecutionFrequency:
+    Type: String
+    Default: 1hour
+    Description: The frequency that you want AWS Config to run evaluations for the rule.
+    AllowedValues:
+    - 1hour
+    - 3hours
+    - 6hours
+    - 12hours
+    - 24hours
+Mappings:
+  Settings:
+    FrequencyMap:
+      1hour   : One_Hour
+      3hours  : Three_Hours
+      6hours  : Six_Hours
+      12hours : Twelve_Hours
+      24hours : TwentyFour_Hours
+Resources:
+  CheckForIAMUserMFA:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: !Sub ${ConfigRuleName}
+      Description: Checks whether the AWS Identity and Access Management users have multi-factor authentication (MFA) enabled. The rule is COMPLIANT if MFA is enabled.
+      Source:
+        Owner: AWS
+        SourceIdentifier: IAM_USER_MFA_ENABLED
+      MaximumExecutionFrequency:
+        !FindInMap
+          - Settings
+          - FrequencyMap
+          - !Ref MaximumExecutionFrequency

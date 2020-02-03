@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Configure AWS Config rules to check whether security groups that are in use disallow unrestricted incoming TCP traffic to the specified ports.
+Parameters:
+  ConfigRuleName:
+    Type: 'String'
+    Description: 'Name for the Config rule'
+  blockedPort1:
+    Type: String
+    Default: '20'
+    Description: Blocked TCP port number.
+  blockedPort2:
+    Type: String
+    Default: '21'
+    Description: Blocked TCP port number.
+  blockedPort3:
+    Type: String
+    Default: '3389'
+    Description: Blocked TCP port number.
+  blockedPort4:
+    Type: String
+    Default: '3306'
+    Description: Blocked TCP port number.
+  blockedPort5:
+    Type: String
+    Default: '4333'
+    Description: Blocked TCP port number.
+Conditions:
+  blockedPort1:
+    Fn::Not:
+    - Fn::Equals:
+      - ''
+      - Ref: blockedPort1
+  blockedPort2:
+    Fn::Not:
+    - Fn::Equals:
+      - ''
+      - Ref: blockedPort2
+  blockedPort3:
+    Fn::Not:
+    - Fn::Equals:
+      - ''
+      - Ref: blockedPort3
+  blockedPort4:
+    Fn::Not:
+    - Fn::Equals:
+      - ''
+      - Ref: blockedPort4
+  blockedPort5:
+    Fn::Not:
+    - Fn::Equals:
+      - ''
+      - Ref: blockedPort5
+Resources:
+  CheckForRestrictedCommonPortsPolicy:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: !Sub ${ConfigRuleName}
+      Description: Checks whether security groups that are in use disallow unrestricted incoming TCP traffic to the specified ports.
+      InputParameters:
+        blockedPort1:
+          Fn::If:
+          - blockedPort1
+          - Ref: blockedPort1
+          - Ref: AWS::NoValue
+        blockedPort2:
+          Fn::If:
+          - blockedPort2
+          - Ref: blockedPort2
+          - Ref: AWS::NoValue
+        blockedPort3:
+          Fn::If:
+          - blockedPort3
+          - Ref: blockedPort3
+          - Ref: AWS::NoValue
+        blockedPort4:
+          Fn::If:
+          - blockedPort4
+          - Ref: blockedPort4
+          - Ref: AWS::NoValue
+        blockedPort5:
+          Fn::If:
+          - blockedPort5
+          - Ref: blockedPort5
+          - Ref: AWS::NoValue
+      Scope:
+        ComplianceResourceTypes:
+        - AWS::EC2::SecurityGroup
+      Source:
+        Owner: AWS
+        SourceIdentifier: RESTRICTED_INCOMING_TRAFFIC
